@@ -4,6 +4,7 @@ from flask import jsonify
 import json
 from flask_cors import CORS
 import uuid
+from model_mongodb import User
 
 app = Flask(__name__)
 CORS(app)
@@ -13,34 +14,7 @@ def hello_world():
     return 'Hello, World!'
 
 users = {
-   'users_list' :
-   [
-      {
-         'id' : 'xyz789',
-         'name' : 'Charlie',
-         'job': 'Janitor',
-      },
-      {
-         'id' : 'abc123',
-         'name': 'Mac',
-         'job': 'Bouncer',
-      },
-      {
-         'id' : 'ppp222',
-         'name': 'Mac',
-         'job': 'Professor',
-      },
-      {
-         'id' : 'yat999',
-         'name': 'Dee',
-         'job': 'Aspring actress',
-      },
-      {
-         'id' : 'zap555',
-         'name': 'Dennis',
-         'job': 'Bartender',
-      }
-   ]
+   'users_list' : [ ]
 }
 
 @app.route('/users', methods=['GET', 'POST', 'DELETE'])
@@ -59,7 +33,8 @@ def get_users():
                if user['job'] == search_job:
                   subdict['users_list'].append(user)
          return subdict
-      return users
+      users = User.find_all()
+      return {"user_list" : users}
    elif request.method == 'POST':
       userToAdd = request.get_json()
       userToAdd['id'] = str(uuid.uuid1())
