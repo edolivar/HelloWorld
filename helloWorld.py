@@ -1,6 +1,7 @@
 from flask import Flask
 from flask import request
 from flask import jsonify
+import json
 from flask_cors import CORS
 import uuid
 
@@ -42,7 +43,7 @@ users = {
    ]
 }
 
-@app.route('/users', methods=['GET', 'POST'])
+@app.route('/users', methods=['GET', 'POST', 'DELETE'])
 def get_users():
    if request.method == 'GET':
       search_username = request.args.get('name')
@@ -66,8 +67,14 @@ def get_users():
       resp = jsonify(userToAdd)
       resp.status_code = 201
       return resp
+   elif request.method == 'DELETE':
+      userToDelete = request.get_json()
+      users['users_list'].remove(userToDelete)
+      resp = jsonify(success=True)
+      resp.status_code = 204
+      return resp
 
-@app.route('/users/<id>', methods=['GET', 'DELETE'])
+@app.route('/users/<id>', methods=['GET'])
 def get_user(id):
    if request.method == 'GET':
       if id :
@@ -76,12 +83,4 @@ def get_user(id):
                return user
          return ({})
       return users
-   elif request.method == 'DELETE':
-      if id :
-         for user in users['users_list']:
-            if user['id'] == id:
-               users['users_list'].remove(user)
-               return ('', 204)
-         return ('', 404) 
-      return ('', 404)  
 
